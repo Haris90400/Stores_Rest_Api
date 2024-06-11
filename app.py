@@ -48,4 +48,6 @@ def get_items_in_store(name):
         if store["name"] == name:
             return {"items":store["items"]}
     return {"msg":"Store doesn't exist in the database."},404
-    
+
+if __name__ == "__main__":
+    app.run(debug=True) 
