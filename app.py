@@ -1,7 +1,6 @@
-from flask import Flask,request
-from db import stores,items
+from flask import Flask, request, abort
+from db import stores, items
 import uuid
-from flask_smorest import abort
 
 app = Flask(__name__)
 
@@ -67,14 +66,49 @@ def get_store(store_id):
         return stores[store_id]
     except KeyError:
          return abort(404,message="Store not found.")
+    
+## Delete a particular store
+@app.delete("/store/<string:store_id>")
+def delete_store(store_id):
+    try:
+        del stores[store_id]
+        return {"message":"Store Deleted"}
+    except KeyError:
+        abort(404,message="Item not found.")
 
-## Create a particular item
+## Get a particular item
 @app.get("/item/<string:item_id>")
 def get_items_in_store(item_id):
     try:
         return items[item_id]
     except KeyError:
         return abort(404,message="Item not found.")
+    
+## Delete a particular item
+@app.delete("/item/<string:item_id>")
+def delete_item(item_id):
+    try:
+        del items[item_id]
+        return {"message":"Item Deleted"}
+    except KeyError:
+        abort(404,message="Item not found.")
+
+##Update an item
+@app.put("/item/<string:item_id>")
+def update_item(item_id):
+    item_data = request.get_json()
+    if "price" not in item_data or "name" not in item_data:
+        abort(
+            400,
+            message="Bad request. Ensure 'price' and 'name' are included in the JSON payload.",
+        )
+    try:
+        item = items[item_id]
+        item.update(item_data)
+        return item
+    except KeyError:
+        abort(400,message = "Item not found")
+
 
 if __name__ == "__main__":
     app.run(debug=True) 
