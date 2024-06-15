@@ -5,9 +5,9 @@ from resources.store import blp as StoreBluePrint
 from resources.tag import blp as TagBluePrint
 
 from db import db
-import models
-
+from flask_jwt_extended import JWTManager
 import os
+import secrets
 
 
 def create_app(db_url=None):
@@ -25,6 +25,9 @@ def create_app(db_url=None):
     db.init_app(app)
 
     api = Api(app)
+
+    app.config["JWT_SECRET_KEY"] = secrets.SystemRandom().getrandbits(128)
+    jwt = JWTManager(app)
 
     with app.app_context():
         db.create_all()
